@@ -16,6 +16,7 @@ from gridplayer.params import env
 from gridplayer.params.static import ColorScheme
 from gridplayer.settings import Settings
 from gridplayer.utils.darkmode import is_dark_mode, is_system_dark_mode
+from gridplayer.utils.ui_scale import scaled_size
 
 THEME_LIGHT = MappingProxyType(
     {
@@ -82,6 +83,23 @@ _DIALOG_ICON_ROLES = (
 
 class NoDialogButtonIcons(QProxyStyle):
     """Blanks the standard OK/Cancel/etc icons that Linux themes add."""
+
+    def pixelMetric(self, metric, option=None, widget=None):
+        value = super().pixelMetric(metric, option, widget)
+        if (
+            metric
+            in {
+                QStyle.PM_SmallIconSize,
+                QStyle.PM_LargeIconSize,
+                QStyle.PM_ButtonIconSize,
+                QStyle.PM_ToolBarIconSize,
+                QStyle.PM_LayoutHorizontalSpacing,
+                QStyle.PM_LayoutVerticalSpacing,
+            }
+            and value > 0
+        ):
+            return scaled_size(value)
+        return value
 
     def standardIcon(self, element, option=None, widget=None):
         if element in _DIALOG_ICON_ROLES:

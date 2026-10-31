@@ -27,6 +27,7 @@ from gridplayer.utils.bookmarks import bookmark_on
 from gridplayer.utils.drop_zone import DropIndicator
 from gridplayer.utils.qt import translate
 from gridplayer.utils.time_txt import ms_time_txt
+from gridplayer.utils.ui_scale import scaled_size
 
 # The overlay's boxes over a video: the fill lets the picture through, what
 # is written and drawn on it does not, and a soft shadow round each box gives
@@ -486,7 +487,8 @@ class OverlayWidget(QWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        font_height = 13
+        font_height = max(scaled_size(13), self.fontMetrics().height())
+        self.padding = scaled_size(type(self).padding)
         self._color = QColor(Qt.white)
 
         # on the opaque overlay, which shows nothing through it: no see-through

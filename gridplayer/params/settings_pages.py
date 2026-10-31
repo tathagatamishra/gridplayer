@@ -200,6 +200,10 @@ PAGES = (
             Section(
                 translate("SettingsDialog", "General"),
                 "player/color_scheme",
+                "player/ui_scale",
+                "player/hide_title_bar",
+                Indented("player/title_bar_timeout"),
+                "player/square_corners",
                 "player/one_instance",
                 "player/stay_on_top",
                 "player/start_maximized",

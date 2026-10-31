@@ -69,7 +69,12 @@ VIDEO_FIELDS: tuple[SettingField, ...] = (
     ),
     FloatSpinField(
         settings_key="video_defaults/volume",
-        label=translate("SettingsDialog", "Volume"),
+        label=translate("SettingsDialog", "Default volume"),
+        tooltip=translate(
+            "SettingsDialog",
+            "Volume for newly opened videos: 0 is silent, 0.5 is 50%, 1 is 100%. "
+            "Videos restored from a playlist keep their saved volume.",
+        ),
         minimum=0,
         maximum=1,
         decimals=2,

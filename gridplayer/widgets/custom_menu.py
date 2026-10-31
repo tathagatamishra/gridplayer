@@ -11,6 +11,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QMenu, QProxyStyle, QStyle
 
 from gridplayer.params.theme import current_colors
+from gridplayer.utils.ui_scale import scaled_size
 
 ICON_SIZE = 24
 
@@ -88,7 +89,7 @@ class CustomMenu(QMenu):
 class BigMenuIcons(QProxyStyle):
     def pixelMetric(self, metric, option=None, widget=None):
         if metric == QStyle.PM_SmallIconSize:
-            return ICON_SIZE
+            return scaled_size(ICON_SIZE)
         return super().pixelMetric(metric, option, widget)
 
     def styleHint(self, hint, option=None, widget=None, returnData=None):
@@ -241,4 +242,4 @@ def _get_theme_style():
     for c_key, c_value in colors.items():
         style = style.replace(f"{{{c_key}}}", c_value)
 
-    return style.replace("{icon_size}", str(ICON_SIZE))
+    return style.replace("{icon_size}", str(scaled_size(ICON_SIZE)))

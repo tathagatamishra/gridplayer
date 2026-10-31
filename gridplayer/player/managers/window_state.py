@@ -79,7 +79,14 @@ class WindowStateManager(ManagerBase):
             )
         )
 
+        self.parent().setProperty(
+            "gridplayer_square_corners", Settings().get("player/square_corners")
+        )
         app = QApplication.instance()
+        if env.IS_WINDOWS:
+            from gridplayer.widgets.auto_title_bar import AutoTitleBar
+
+            self._auto_title_bar = AutoTitleBar(self.parent())
 
         # In the tray the player is hidden, and closing any other window
         # would quit with it as the last one. Closing the player quits by

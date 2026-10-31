@@ -69,6 +69,10 @@ _default_settings = {
     "player/media_keys_background": True,
     "player/one_instance": True,
     "player/stay_on_top": False,
+    "player/ui_scale": 100,
+    "player/hide_title_bar": False,
+    "player/title_bar_timeout": 3,
+    "player/square_corners": True,
     "player/start_maximized": False,
     "player/start_fullscreen": False,
     # the icon in the tray (the menu bar on macOS), and what goes there

@@ -372,7 +372,7 @@ STATE = {
 _STARTED = time.monotonic()
 
 
-def start(media: Media, out: Path, settings: dict) -> Driver:
+def start(media: Media, out: Path, settings: dict, platform="offscreen") -> Driver:
     """The app, as run.py starts it: offscreen, with settings and data of its
     own under out, and these settings over the defaults above."""
 
@@ -400,12 +400,9 @@ def start(media: Media, out: Path, settings: dict) -> Driver:
 
     # the app picks xcb itself whenever there is no Wayland, whatever
     # QT_QPA_PLATFORM says
-    env.QT_PLATFORM = "offscreen"
+    env.QT_PLATFORM = platform
 
     init_app_env()
-    app = init_app()
-    env.VLC_VERSION, env.VLC_PYTHON_VERSION = init_vlc()
-
     store = Settings()
     for key, value in {
         **DEFAULT_SETTINGS,
@@ -413,6 +410,10 @@ def start(media: Media, out: Path, settings: dict) -> Driver:
         **settings,
     }.items():
         store.set(key, _setting_value(key, value))
+
+    # Startup appearance settings must be present before QApplication is built.
+    app = init_app()
+    env.VLC_VERSION, env.VLC_PYTHON_VERSION = init_vlc()
 
     from gridplayer.player import Player
 

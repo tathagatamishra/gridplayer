@@ -1,6 +1,6 @@
 """Run a scenario against the real app.
 
-    uv run python -m tests.real_app.run SCENARIO [--out DIR]
+    uv run python -m tests.real_app.run SCENARIO [--out DIR] [--platform windows]
 
 SCENARIO is one of tests/real_app/scenarios by name ("playback"), or the
 path of a .py file anywhere, such as one written for a single debug run.
@@ -14,7 +14,8 @@ It defines
         d.act(block, "Next Chapter")
         d.wait_until(lambda: block.chapters.playing == 1, "in Part One")
 
-and gets the app offscreen, with settings and data of its own, and the
+and gets the app offscreen (or on the named native platform), with settings
+and data of its own, and the
 media of tests/real_app/media.py made if they are not yet. Every step is
 printed as a line of JSON as it happens.
 
@@ -50,6 +51,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("scenario")
     parser.add_argument("--out", type=Path)
+    parser.add_argument(
+        "--platform",
+        default="offscreen",
+        help="Qt platform (e.g. windows for native window checks)",
+    )
     args = parser.parse_args()
 
     out = args.out or Path(tempfile.mkdtemp(prefix="gridplayer-run-"))
@@ -63,7 +69,9 @@ def main() -> int:
 
     from tests.real_app.driver import start
 
-    driver = start(media.ensure(), out, getattr(module, "SETTINGS", {}))
+    driver = start(
+        media.ensure(), out, getattr(module, "SETTINGS", {}), platform=args.platform
+    )
 
     # An exception in a Qt slot goes here; with Python's own hook PyQt
     # aborts the process instead

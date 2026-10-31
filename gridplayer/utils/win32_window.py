@@ -60,16 +60,58 @@ def _dwm_set(hwnd, attribute, value: int) -> None:
 
 
 def apply_native_background(widget: QWidget, *, create: bool = True) -> None:
-    if not _is_windows_11:
+    if not _is_windows_11():
         return
     if not create and widget.windowHandle() is None:
         return
 
     _load_dwmapi()
     hwnd = wintypes.HWND(int(widget.winId()))
+    square = widget.property("gridplayer_square_corners")
+    if square is not None:
+        _dwm_set(hwnd, 33, 1 if square else 0)
     color = widget.palette().color(widget.backgroundRole())
     dark = is_dark_mode()
     _dwm_set(hwnd, _DWMWA_USE_IMMERSIVE_DARK_MODE, int(dark))
     _dwm_set(hwnd, _DWMWA_SYSTEMBACKDROP_TYPE, _DWMSBT_NONE)
     _dwm_set(hwnd, _DWMWA_CAPTION_COLOR, _colorref(color))
     _dwm_set(hwnd, _DWMWA_BORDER_COLOR, _colorref(QColor(current_colors()["border"])))
+
+
+def set_caption_visible(widget: QWidget, visible: bool) -> bool:
+    """Change only the caption bits; keep WS_THICKFRAME and the same HWND.
+
+    In particular, do not toggle Qt.FramelessWindowHint: it removes normal
+    edge resizing and can recreate the native surface hosting VLC.
+    """
+    from PyQt5.QtWidgets import QApplication
+
+    if not env.IS_WINDOWS or QApplication.platformName() != "windows":
+        return False
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
+    user32.GetWindowLongW.argtypes = [wintypes.HWND, ctypes.c_int]
+    user32.GetWindowLongW.restype = wintypes.LONG
+    user32.SetWindowLongW.argtypes = [wintypes.HWND, ctypes.c_int, wintypes.LONG]
+    user32.SetWindowLongW.restype = wintypes.LONG
+    user32.SetWindowPos.argtypes = [
+        wintypes.HWND,
+        wintypes.HWND,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_uint,
+    ]
+    user32.SetWindowPos.restype = wintypes.BOOL
+    hwnd = wintypes.HWND(int(widget.winId()))
+    style = user32.GetWindowLongW(hwnd, -16)  # GWL_STYLE
+    caption = 0x00C00000  # WS_CAPTION
+    desired = style | caption if visible else style & ~caption
+    if style == desired:
+        return True
+    ctypes.set_last_error(0)
+    previous = user32.SetWindowLongW(hwnd, -16, desired)
+    if previous == 0 and ctypes.get_last_error():
+        return False
+    # FRAMECHANGED | NOMOVE | NOSIZE | NOZORDER | NOACTIVATE
+    return bool(user32.SetWindowPos(hwnd, None, 0, 0, 0, 0, 0x0037))

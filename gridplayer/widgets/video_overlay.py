@@ -25,6 +25,7 @@ from gridplayer.utils.compositor_linux import should_make_overlay_opaque
 from gridplayer.utils.drop_zone import DropIndicator
 from gridplayer.utils.qt import MILLISECONDS, qt_connect, translate
 from gridplayer.utils.time_txt import get_time_txt
+from gridplayer.utils.ui_scale import scaled_size
 from gridplayer.widgets.video_overlay_buttons import (
     OverlayButton,
     OverlayExitButton,
@@ -215,9 +216,8 @@ class OverlayBlock(QWidget):
         self.border_widget.hide()
 
         layout_control = QVBoxLayout(self.control_widget)
-        layout_control.setContentsMargins(
-            CONTROL_MARGIN, CONTROL_MARGIN, CONTROL_MARGIN, CONTROL_MARGIN
-        )
+        margin = scaled_size(CONTROL_MARGIN)
+        layout_control.setContentsMargins(margin, margin, margin, margin)
 
         self.drop_indicator = OverlayDropIndicator(parent=self)
         self.drop_indicator.hide()

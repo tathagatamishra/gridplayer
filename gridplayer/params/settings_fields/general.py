@@ -52,6 +52,37 @@ def tray_text(tray: str, menu_bar: str) -> str:
 
 
 GENERAL_FIELDS: tuple[SettingField, ...] = (
+    SpinField(
+        settings_key="player/ui_scale",
+        label=translate("SettingsDialog", "UI size (restart required)"),
+        minimum=50,
+        maximum=200,
+        suffix="%",
+    ),
+    CheckboxField(
+        settings_key="player/hide_title_bar",
+        label=translate("SettingsDialog", "Auto-hide title bar"),
+        shown_if=lambda: env.IS_WINDOWS,
+        tooltip=translate(
+            "SettingsDialog",
+            "Move to the top edge to show the title bar again. "
+            "Drag the window edges with the left mouse button to resize.",
+        ),
+    ),
+    SpinField(
+        settings_key="player/title_bar_timeout",
+        label=translate("SettingsDialog", "Hide title bar after"),
+        minimum=1,
+        maximum=60,
+        suffix=translate("SettingsDialog", "(sec)"),
+        enabled_when=When("player/hide_title_bar"),
+        shown_if=lambda: env.IS_WINDOWS,
+    ),
+    CheckboxField(
+        settings_key="player/square_corners",
+        label=translate("SettingsDialog", "Square window corners (restart required)"),
+        shown_if=lambda: env.IS_WINDOWS,
+    ),
     ComboField(
         settings_key="player/color_scheme",
         label=translate("SettingsDialog", "Color scheme"),

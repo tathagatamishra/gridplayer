@@ -14,6 +14,7 @@ from gridplayer.params.theme import (
     create_fusion_style,
     on_system_theme_changed,
 )
+from gridplayer.settings import Settings
 from gridplayer.utils.darkmode import watch_system_theme
 from gridplayer.utils.wayland import follow_desktop_cursor
 
@@ -23,6 +24,9 @@ def init_app():
         app = QApplication([*sys.argv, "-platform", env.QT_PLATFORM])
     else:
         app = QApplication(sys.argv)
+
+    scale = max(50, min(200, Settings().get("player/ui_scale"))) / 100
+    app.setProperty("gridplayer_ui_scale", scale)
 
     follow_desktop_cursor()
 
@@ -39,7 +43,9 @@ def init_app():
 
     init_icon(app)
 
-    app.setFont(QFont("Hack", FONT_SIZE_MAIN))
+    font = QFont("Hack")
+    font.setPointSizeF(FONT_SIZE_MAIN * scale)
+    app.setFont(font)
 
     init_translator(app)
 
