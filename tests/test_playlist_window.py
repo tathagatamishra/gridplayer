@@ -338,7 +338,7 @@ class TestNewVideos:
 
         assert window._ask_for_videos_here({VOLUME: 0.5}) is answer
         assert seen["text"] == "Change the videos already here too?"
-        assert "Volume" in seen["info"]
+        assert "Default volume" in seen["info"]
 
 
 def test_every_video_default_fills_a_field_of_a_video():
